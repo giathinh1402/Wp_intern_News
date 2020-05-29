@@ -1,28 +1,28 @@
 <?php
 
-/**
+/*
  *khai báo hằng giá trị
     THEME_URL = lay duong dan thu muc theme
     CORE = lay duong dan cua thu muc core
-**/
+*/
  define('THEME_URL', get_stylesheet_directory() );
  define('CORE', THEME_URL . "/core");
 
-/**
+/*
   Nhung file /core/init.php
-**/
+*/
 require_once( CORE . "/init.php" );
 
-/**
+/*
   Thiet lap chieu rong noi dung
-**/
+*/
 if (!isset ($content_width)  ) {
     $content_width = 620;
 }
 
-/**
+/*
   Khai bao chuc nang cua themes
-**/
+*/
 
 if( !function_exists('thinhnguyen_theme_setup')){
 
@@ -115,3 +115,125 @@ if ( ! function_exists( 'site_menu' ) ) {
     wp_nav_menu( $menu );
   }
 }
+
+/* them phan trang cho index */
+if ( ! function_exists( 'page_pagination' ) ) {
+    function page_pagination() {
+    /* Khong hien thi phan trang neu trang do it hon 2 post */
+        if ( $GLOBALS['wp_query']->max_num_pages < 2 ) {
+            return '';  
+        } ?>
+<nav class="pagination" role="navigation">
+    <?php if ( get_next_post_link() ) : ?>
+    <div class="prev"><?php next_posts_link( __('Older Posts', 'thinhnguyen') ); ?></div>
+    <?php endif; ?>
+
+    <?php if ( get_previous_post_link() ) : ?>
+    <div class="next"><?php previous_posts_link( __('Newer Posts', 'thinhnguyen') ); ?></div>
+    <?php endif; ?>
+</nav><?php
+    }
+}
+
+/* hien thi thumnails cho bai viet */
+if ( ! function_exists( 'post_thumbnail' ) ) {
+    function post_thumbnail( $size ) {
+      // Chỉ hiển thumbnail với post không có mật khẩu
+      if ( ! is_single() &&  has_post_thumbnail()  && ! post_password_required() || has_post_format( 'image' ) ) : ?>
+<figure class="post-thumbnail"><?php the_post_thumbnail( $size ); ?></figure><?php
+      endif;
+    }
+  }
+
+/* hien thi tieu de bai post*/
+if ( ! function_exists( 'post_entry_header' ) ) {
+    function post_entry_header() {
+      if ( is_single() ) : ?>
+
+<h1 class="entry-title">
+    <a href="<?php the_permalink(); ?>" rel="bookmark" title="<?php the_title_attribute(); ?>">
+        <?php the_title(); ?>
+    </a>
+</h1>
+<?php else : ?>
+<h2 class="entry-title">
+    <a href="<?php the_permalink(); ?>" rel="bookmark" title="<?php the_title_attribute(); ?>">
+        <?php the_title(); ?>
+    </a>
+</h2><?php
+   
+      endif;
+    }
+  }
+
+/* hien thi thong tin bài post bao gom author, category, date, luot comment */
+if( ! function_exists( 'post_entry_meta' ) ) {
+    function post_entry_meta() {
+      if ( ! is_page() ) :
+        echo '<div class="entry-meta">';
+   
+          // author, date, categories
+          printf( __('<span class="author">Posted by %1$s</span>', 'thinhnguyen'),
+            get_the_author() );
+   
+          printf( __('<span class="date-published"> at %1$s</span>', 'thinhnguyen'),
+            get_the_date() );
+   
+          printf( __('<span class="category"> in %1$s</span>', 'thinhnguyen'),
+            get_the_category_list( ', ' ) );
+   
+          // hien thi so luot comment
+          if ( comments_open() ) :
+            echo ' <span class="meta-reply">';
+              comments_popup_link(
+                __('Leave a comment', 'thinhnguyen'),
+                __('One comment', 'thinhnguyen'),
+                __('% comments', 'thinhnguyen'),
+                __('Read all comments', 'thinhnguyen')
+               );
+            echo '</span>';
+          endif;
+        echo '</div>';
+      endif;
+    }
+  }
+
+  /* hien thi noi dung cua post */
+
+  if ( ! function_exists( 'post_entry_content' ) ) {
+    function post_entry_content() {
+    if ( ! is_single() && !is_page() ) :
+        the_excerpt();
+      else :
+        the_content();
+        /*
+         * Code hiển thị phân trang trong post type
+         */
+        $link_pages = array(
+          'before' => __('<p>Page:', 'thinhnguyen'),
+          'after' => '</p>',
+          'nextpagelink'     => __( 'Page before', 'thinhnguyen' ),
+          'previouspagelink' => __( 'Page after', 'thinhnguyen' )
+        );
+        wp_link_pages( $link_pages );
+      endif;
+   
+    }
+
+    /* post read more */
+    function post_readmore() {
+        return '...<a class="read-more" href="'. get_permalink( get_the_ID() ) . '">' . __('Read More', ' thinhnguyen ') . '</a>';
+    }
+    add_filter( 'excerpt_more', 'post_readmore' );
+  }
+
+/* ------------------- 
+Css function ----------------*/
+
+/* chèn css vào theme */
+    function css_styles() {
+        wp_register_style( 'main-style', get_template_directory_uri() . '/style.css', 'all' );
+        wp_enqueue_style( 'main-style' );
+    }
+    add_action( 'wp_enqueue_scripts', 'css_styles' );
+  
