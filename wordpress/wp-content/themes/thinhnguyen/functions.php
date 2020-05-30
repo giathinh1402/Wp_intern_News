@@ -41,6 +41,15 @@ if( !function_exists('thinhnguyen_theme_setup')){
         /* them title tag */
         add_theme_support( 'title-tag' );
 
+        /* them logo */
+        add_theme_support( 'custom-logo', array(
+          'height'      => 100,
+          'width'       => 400,
+          'flex-height' => true,
+          'flex-width'  => true,
+          'header-text' => array( 'site-title', 'site-description' ),
+        ) );
+
         /* them custom background */
         $default_background = array(
             'default-color' => '#e8e8e8'
@@ -111,6 +120,7 @@ if ( ! function_exists( 'site_menu' ) ) {
       'theme_location' => $menu , //dua tren function get menu location o tren
       'container' => 'nav',
       'container_class' => $menu,
+      'items_wrap'      => '<ul id="%1$s" class="%2$s sf-menu">%3$s</ul>',
     );
     wp_nav_menu( $menu );
   }
@@ -230,10 +240,34 @@ if( ! function_exists( 'post_entry_meta' ) ) {
 /* ------------------- 
 Css function ----------------*/
 
-/* chèn css vào theme */
-    function css_styles() {
-        wp_register_style( 'main-style', get_template_directory_uri() . '/style.css', 'all' );
-        wp_enqueue_style( 'main-style' );
-    }
-    add_action( 'wp_enqueue_scripts', 'css_styles' );
+/*
+@ Chèn CSS và Javascript vào theme
+@ sử dụng hook wp_enqueue_scripts() để hiển thị nó ra ngoài front-end
+*/
+function css_styles() {
+  /*
+   * Chèn file style.css chứa CSS của theme
+   */
+  wp_register_style( 'main-style', get_template_directory_uri() . '/style.css', 'all' );
+  wp_enqueue_style( 'main-style' );
+ 
+  /*
+   * Chèn các file CSS của SuperFish Menu
+   */
+  wp_register_style( 'superfish-css', get_template_directory_uri() . '/superfish.css', 'all' );
+  wp_enqueue_style( 'superfish-css' );
+ 
+  /*
+   * Chèn file JS của SuperFish Menu
+   */
+  wp_register_script( 'superfish-js', get_template_directory_uri() . '/superfish.js', array('jquery') );
+  wp_enqueue_script( 'superfish-js' );
+ 
+  /*
+   * Chèn file JS custom.js
+   */
+  wp_register_script( 'custom-js', get_template_directory_uri() . '/custom.js', array('jquery') );
+  wp_enqueue_script( 'custom-js' );
+}
+add_action( 'wp_enqueue_scripts', 'css_styles' );
   

@@ -15,10 +15,15 @@
 </head>
 
 <body <?php body_class(); ?>>
-   
+
     <div id="container">
         <header id="header">
+            <?php 
+                $custom_logo_id = get_theme_mod( 'custom_logo' );
+                $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
+            ?>
+            <img src="<?php echo $image[0]; ?>" alt="">
             <?php site_logo(); ?>
             <?php site_menu( 'primary-menu' ); ?>
+
         </header>
-    
